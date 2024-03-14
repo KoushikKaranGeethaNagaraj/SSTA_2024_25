@@ -15,7 +15,7 @@ from torch import optim
 from VAE_model import VanillaVAE
 import argparse
 import random
-from seq_dataset import data_provider
+from dataset_processing.batch_accessing import data_provider
 
 import lpips
 # from skimage.measure import compare_ssim

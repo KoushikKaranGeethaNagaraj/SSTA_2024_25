@@ -13,7 +13,7 @@ import torch.nn.functional as F
 from torch import optim
 import argparse
 import random
-from seq_dataset import data_provider
+from dataset_processing.batch_accessing import data_provider
 from skimage.measure import compare_ssim
 from VAE_model import VanillaVAE
 import lpips
