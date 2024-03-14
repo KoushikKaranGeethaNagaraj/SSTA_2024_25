@@ -13,7 +13,11 @@ import torch.nn.functional as F
 from torch import optim
 import argparse
 import random
+<<<<<<< HEAD
 from seq_dataset import data_provider
+=======
+from dataset_processing.batch_accessing import data_provider
+>>>>>>> e2469384c965adc12a8883674a98a2109ee4617e
 from skimage.metrics import structural_similarity as compare_ssim
 from VAE_model import VanillaVAE
 import lpips

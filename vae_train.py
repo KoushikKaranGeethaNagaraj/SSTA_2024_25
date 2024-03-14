@@ -15,7 +15,7 @@ from torch import optim
 from VAE_model import VanillaVAE
 import argparse
 import random
-from seq_dataset import data_provider
+from dataset_processing.batch_accessing import data_provider
 
 import lpips
 # from skimage.measure import compare_ssim
@@ -147,7 +147,8 @@ def training(N, Nte, bs, n_epoch, act, data_mode, args):
         args.data_name, args.train_data_paths, args.valid_data_paths, args.bs, args.img_width,
         seq_length=args.num_step + args.num_past, is_training=True, num_views=args.num_views, img_channel=args.img_channel,
         baseline=args.baseline, args=args)
-
+    print(train_input_handle)
+    # quit()
     if args.message_type in ['raw_data']:
         input_dim = 3  # + 3 + 3
     else:
@@ -192,14 +193,18 @@ def training(N, Nte, bs, n_epoch, act, data_mode, args):
         sum_kl_loss = 0
         print('Training ...')
         train_input_handle.begin(do_shuffle=True)
+        train_input_handle.print_stat()
 
 
         while (train_input_handle.no_batch_left() == False and args.mode == 'train'):
             ims = train_input_handle.get_batch()
+            print("input",ims.shape)
+            
             train_input_handle.next()
             x_batch = ims[:, :]
             # gt_batch = ims[:, 1:]
             gt_batch = ims[:, args.num_past:]
+            print(x_batch.shape,gt_batch.shape)
             x_batch = torch.from_numpy(x_batch.astype(np.float32)).to(args.device)  # .reshape(x.shape[0], 1))
             gt_batch = torch.from_numpy(gt_batch.astype(np.float32)).to(args.device)  # .reshape(gt.shape[0], 1))
             # print(x_batch.shape, gt_batch.shape) # torch.Size([10, 19, 128, 128, 6]) torch.Size([10, 19, 128, 128, 6])
@@ -489,30 +494,25 @@ if __name__ == "__main__":
     parser.add_argument('--num_past', type=int, default=1)
     parser.add_argument('--num_cl_step', type=int, default=100)
     parser.add_argument('--n_epoch', type=int, default=60, help='200')
-    parser.add_argument('--bs', type=int, default=1)
+    parser.add_argument('--bs', type=int, default=2)
     parser.add_argument('--Nte', type=int, default=20, help='200')
     parser.add_argument('--N', type=int, default=100, help='1000')
     parser.add_argument('--kld_weight', type=float, default=0., help='0.00005')
 
-    parser.add_argument('--data_name', type=str, default='model_vae',
-                        help='SINE; circle_motion; students003, fluid_flow_1， carla_town02_20211201, '
-                             'circle_motion_bg_change_20220128; circle_motion_bg_change_20220130 '
-                             'two_circle_motion_overlap')
+    parser.add_argument('--data_name', type=str, default='model_vae')
     parser.add_argument('--device', type=str, default='cuda:0', help='cuda:0 cuda:0; cpu:0 cpu:0')
     parser.add_argument('--with_comm', type=str2bool, default=False, help='whether to use communication')
-    parser.add_argument('--train_data_paths', type=str, default="../../../../tools/circle_motion_30/train",
-                        help='../tools/${DATASET_NAME}/train, ../../../../tools/circle_motion_30/train, sumo_sanjose-2021-11-06_20.28.57_30, carla_town02_20211201, students003')
+    #change this to train
+    parser.add_argument('--train_data_paths', type=str, default=r"DATASET\val")
     # carla_town02_20211201
-    parser.add_argument('--valid_data_paths', type=str, default="../../../../tools/circle_motion_30/eval",
-                        help='../tools/${DATASET_NAME}/eval, ../../../../tools/circle_motion_30/eval, sumo_sanjose-2021-11-06_20.28.57_30, carla_town02_20211201, students003')
-    # sumo_sanjose-2021-11-06_20.28.57_30
+    parser.add_argument('--valid_data_paths', type=str, default=r"DATASET\test")
     # RGB dataset
     parser.add_argument('--img_width', type=int, default=128, help='img width')
     parser.add_argument('--num_views', type=int, default=2, help='num views')
     parser.add_argument('--img_channel', type=int, default=3, help='img channel')
-    parser.add_argument('--baseline', type=str, default='1_NN_4_img_GCN',
-                        help='1_NN_1_img_no_GCN, 1_NN_4_img_no_GCN, 4_NN_4_img_GCN, 1_NN_4_img_GCN, 4_NN_4_img_no_GCN, '
-                             '4_NN_4_img_FC, 4_NN_4_img_Identity')
+
+    parser.add_argument('--baseline', type=str, default='SSTA_view_view',
+                        help="SSTA_view_view,SSTA_views_1")# This parameter is used to prepare the dataset,alternate or making 4 view dataset to 1 view dataset(SSTA_views_1)
     parser.add_argument('--gen_frm_dir', type=str, default= "/storage/home/hcoda1/9/knagaraj31/p-skousik3-0/SSTA_2022/sim_vae_files/vae_sim_model_32_16_8")
     parser.add_argument('--num_save_samples', type=int, default=10)
     parser.add_argument('--layer_norm', type=int, default=1)
@@ -531,10 +531,7 @@ if __name__ == "__main__":
     h_units = [10, 10]
     timestr = time.strftime("%Y%m%d-%H%M%S")
     args.gen_frm_dir = os.path.join(args.gen_frm_dir)
-    args.train_data_paths = "/storage/home/hcoda1/9/knagaraj31/p-skousik3-0/train".format(args.data_name)
-    #When training or mode=train
-    args.valid_data_paths = "/storage/home/hcoda1/9/knagaraj31/p-skousik3-0/val".format(args.data_name)
     #When testing or mode=eval
-#     args.valid_data_paths = "/storage/home/hcoda1/9/knagaraj31/p-skousik3-0/test".format(args.data_name)
+#     args.valid_data_paths = r"DATASET\test".format(args.data_name)
 
     training(args.N, args.Nte, args.bs, args.n_epoch, args.act, args.data_mode, args)
