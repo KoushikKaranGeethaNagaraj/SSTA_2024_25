@@ -124,8 +124,8 @@ class VanillaVAE(nn.Module):
         :return: (Tensor) [B x D]
         """
         std = torch.exp(0.5 * logvar)
-        # eps = torch.randn_like(std)
-        eps = torch.ones_like(std)
+        eps = torch.randn_like(std)
+        # eps = torch.ones_like(std)
         return eps * std + mu
 
     def forward(self, input, **kwargs):
