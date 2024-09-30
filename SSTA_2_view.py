@@ -508,7 +508,7 @@ if __name__ == "__main__":
     parser.add_argument('--act', type=str, default="relu", help='relu')
     parser.add_argument('--mode', type=str, default="train", help='train / eval/transfer_learning')
     parser.add_argument('--eval_mode', type=str, default='multi_step_eval', help='multi_step_eval / single_step_eval')
-    parser.add_argument('--eval_num_step', type=int, default=30)
+    parser.add_argument('--eval_num_step', type=int, default=15)
     parser.add_argument('--eval_per_step', type=int, default=5)
     parser.add_argument('--mask_per_step', type=int, default=1000000000)
     parser.add_argument('--log_per_epoch', type=int, default=10)
