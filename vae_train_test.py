@@ -446,7 +446,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--baseline', type=str, default='SSTA_view_view',
                         help="SSTA_view_view,SSTA_views_1")# This parameter is used to prepare the dataset,alternate or making 4 view dataset to 1 view dataset(SSTA_views_1)
-    parser.add_argument('--vae_save_dir', type=str, default= r"/home/knagaraj31/SSTA_2024_2025/vae_trained/vae_sim_model_32_16_8_latent000000rand")
+    parser.add_argument('--vae_save_dir', type=str, default= r"vae_trained/vae_sim_model_32_16_8_latent000000rand")
     parser.add_argument('--num_save_samples', type=int, default=10)
     parser.add_argument('--layer_norm', type=int, default=1)
     parser.add_argument('--num_hidden', type=str, default='32,16,8', help='64,64,64,64')
